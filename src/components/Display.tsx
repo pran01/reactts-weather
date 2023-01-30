@@ -10,16 +10,37 @@ type DisplayProps = {
   city: string;
   country: string;
   weather: WeatherType;
+  icon: string;
+  localtime: {
+    month: string;
+    day: number;
+    year: number;
+    hour: number;
+    minute: number;
+  };
 };
-const Display = ({ city, country, weather }: DisplayProps) => {
+const Display = ({ city, country, weather, icon, localtime }: DisplayProps) => {
   return (
-    <div className="w-64 h-64 rounded-lg bg-white/20 backdrop-blur-md flex flex-col justify-center items-center z-[30] p-2">
+    <div className="w-64 md:w-1/3 h-max rounded-lg bg-white/20 backdrop-blur-md flex flex-col justify-center items-center z-[30] p-2">
       <div className="text-2xl font-bold text-center">
         {city}, {country}
       </div>
+      <div>
+        <b>Date: </b>
+        {localtime.day} {localtime.month} {localtime.year}
+      </div>
+      <div>
+        <b>Time: </b>
+        {localtime.hour}:{localtime.minute}
+      </div>
       <div
-        className="text-4xl font-bold my-2"
+        className="text-4xl font-bold my-2 mr-4 flex justify-center items-center"
         style={{ textShadow: "2px 2px 5px white" }}>
+        <img
+          src={require("../assets/icons/" + icon)}
+          alt="weather icon"
+          className=""
+        />
         {weather?.temp_c}°C
       </div>
       <div>

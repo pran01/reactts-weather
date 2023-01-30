@@ -15,7 +15,14 @@ type WeatherType = {
 function App() {
   const [citySearch, setCitySearch] = useState("");
   const [countrySearch, setCountrySearch] = useState("");
-
+  const [icon, setIcon] = useState("day/113.png");
+  const [localtime, setLocaltime] = useState<{
+    month: string;
+    day: number;
+    year: number;
+    hour: number;
+    minute: number;
+  }>({ month: "Jan", day: 1, year: 2000, hour: 1, minute: 1 });
   const [weather, setWeather] = useState<WeatherType>({
     feelslike_c: 0,
     temp_c: 0,
@@ -34,12 +41,47 @@ function App() {
   let api = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${cityWeather}`;
   let searchApi = `https://api.weatherapi.com/v1/search.json?key=${apiKey}&q=${citySearch}`;
 
+  const getMonth = (month: number): string => {
+    switch (month) {
+      case 0:
+        return "Jan";
+      case 1:
+        return "Feb";
+      case 2:
+        return "Mar";
+      case 3:
+        return "Apr";
+      case 4:
+        return "May";
+      case 5:
+        return "Jun";
+      case 6:
+        return "Jul";
+      case 7:
+        return "Aug";
+      case 8:
+        return "Sep";
+      case 9:
+        return "Oct";
+      case 10:
+        return "Nov";
+      case 11:
+        return "Dec";
+      default:
+        return "";
+    }
+  };
   useEffect(() => {
     const apiCall = async () => {
       try {
         if (cityWeather !== "") {
           const res = await axios.get(api).then((res) => res);
           console.log(res.data);
+          if (res.data.current.condition.icon.includes("day")) {
+            setIcon(res.data.current.condition.icon.slice(-11));
+          } else {
+            setIcon(res.data.current.condition.icon.slice(-13));
+          }
           setWeather({
             feelslike_c: res.data.current.feelslike_c as number,
             temp_c: res.data.current.temp_c as number,
@@ -49,6 +91,15 @@ function App() {
           });
           setCity(res.data.location.name);
           setCountry(res.data.location.country);
+          let date = new Date(res.data.location.localtime);
+          let month = date.getMonth();
+          setLocaltime({
+            month: getMonth(month),
+            day: date.getDay(),
+            year: date.getFullYear(),
+            hour: date.getHours(),
+            minute: date.getMinutes(),
+          });
         }
       } catch (error) {
         console.error(error);
@@ -97,7 +148,13 @@ function App() {
         suggestionsVisible={suggestionsVisible}
       />
       {cityWeather !== "" && (
-        <Display city={city} country={country} weather={weather} />
+        <Display
+          city={city}
+          country={country}
+          weather={weather}
+          icon={icon}
+          localtime={localtime!}
+        />
       )}
     </div>
   );
