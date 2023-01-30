@@ -14,7 +14,6 @@ type WeatherType = {
 
 function App() {
   const [citySearch, setCitySearch] = useState("");
-  const [countrySearch, setCountrySearch] = useState("");
   const [icon, setIcon] = useState("day/113.png");
   const [localtime, setLocaltime] = useState<{
     month: string;
@@ -37,9 +36,45 @@ function App() {
   >([]);
   const [suggestionsVisible, setSuggestionsVisible] = useState(false);
   const [cityWeather, setCityWeather] = useState("");
+  const [bgImg, setBgImg] = useState(
+    "bg-[url('./assets/images/clearsky.jpg')]"
+  );
   let apiKey = "49f4aaed0988469cae764440233001";
   let api = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${cityWeather}`;
   let searchApi = `https://api.weatherapi.com/v1/search.json?key=${apiKey}&q=${citySearch}`;
+
+  const changeBgImg = (code: number) => {
+    switch (code) {
+      case 1000:
+        setBgImg("bg-[url('./assets/images/clearsky.jpg')]");
+        break;
+      case 1003:
+        setBgImg("bg-[url('./assets/images/cloudy.jpg')]");
+        break;
+      case 1006:
+        setBgImg("bg-[url('./assets/images/cloudy.jpg')]");
+        break;
+      case 1009:
+        setBgImg("bg-[url('./assets/images/overcast.jpg')]");
+        break;
+      case 1030:
+        setBgImg("bg-[url('./assets/images/mist.jpg')]");
+        break;
+      case 1063:
+      case 1180:
+      case 1186:
+      case 1189:
+      case 1192:
+      case 1195:
+      case 1198:
+      case 1201:
+      case 1240:
+        setBgImg("bg-[url('./assets/images/overcast.jpg')]");
+        break;
+      default:
+        setBgImg("bg-[url('./assets/images/clearsky.jpg')]");
+    }
+  };
 
   const getMonth = (month: number): string => {
     switch (month) {
@@ -76,7 +111,6 @@ function App() {
       try {
         if (cityWeather !== "") {
           const res = await axios.get(api).then((res) => res);
-          console.log(res.data);
           if (res.data.current.condition.icon.includes("day")) {
             setIcon(res.data.current.condition.icon.slice(-11));
           } else {
@@ -100,6 +134,7 @@ function App() {
             hour: date.getHours(),
             minute: date.getMinutes(),
           });
+          changeBgImg(res.data.current.condition.code);
         }
       } catch (error) {
         console.error(error);
@@ -113,7 +148,6 @@ function App() {
       try {
         if (citySearch !== "") {
           const res2 = await axios.get(searchApi).then((res) => res);
-          console.log(res2.data);
           // setWeather(res.data.main);
           let suggestion: { city: string; country: string }[] = [];
           res2.data.forEach((location: any) =>
@@ -137,9 +171,8 @@ function App() {
 
   return (
     <div
-      className="w-screen h-screen flex items-center justify-center flex-col bg-[url('./assets/images/mist.jpg')] shadow-xl bg-center bg-cover bg-no-repeat
-    font-titillium-web
-    ">
+      className={`w-screen h-screen flex items-center justify-center flex-col ${bgImg} 
+      shadow-xl bg-center bg-cover bg-no-repeat font-titillium-web`}>
       <CityInput
         citySearch={citySearch}
         setCitySearch={setCitySearch}
